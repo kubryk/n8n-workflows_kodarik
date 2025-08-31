@@ -1,0 +1,324 @@
+{
+  "name": "fitness-coach",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "План занять",
+        "formDescription": "Генерація плану занять на 4 тижні",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Ім'я",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Стать",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Чоловіча"
+                  },
+                  {
+                    "option": "Жіноча"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Вік",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Вага",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Зріст",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Фізична підготовка",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Низька"
+                  },
+                  {
+                    "option": "Середня"
+                  },
+                  {
+                    "option": "Висока"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Мета",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Схуднення"
+                  },
+                  {
+                    "option": "Набір м’язів"
+                  },
+                  {
+                    "option": "Витривалість"
+                  },
+                  {
+                    "option": "Загальна форма"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Обмеження",
+              "placeholder": "Нема",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Де ви плануєте займатись? (вдома, в залі, на вулиці)",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Який інвентар у вас є? (гантелі, турнік, скакалка, килимок)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -256
+      ],
+      "id": "fce25787-6639-451a-8abd-22bfa7c147e4",
+      "name": "On form submission",
+      "webhookId": "c8a6902a-ca50-408f-bbbf-5cc949b3fe24"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Ти — професійний сертифікований тренер. Твоє завдання — створювати персоналізовані 4-тижневі плани тренувань для людей на основі їхніх фізичних параметрів та цілей. Пиши чітко, професійно та з мотивацією.\n\n\nСтвори 4-тижневий план тренувань для наступної людини:\n\nІм’я: {{ $json['Ім\\'я'] }}\nВік: {{ $json['Вік'] }}\nСтать: {{ $json['Стать'] }}\nЗріст: {{ $json['Зріст'] }} см\nВага: {{ $json['Вага'] }} кг\nРівень фізичної підготовки: {{ $json['Фізична підготовка'] }}\nМета: {{ $json['Мета'] }}\nТравми або обмеження: {{ $json['Обмеження'] }}\nМісце тренувань: {{ $json['Де ви плануєте займатись? (вдома, в залі, на вулиці)'] }} \nДоступний інвентар: {{ $json['Який інвентар у вас є? (гантелі, турнік, скакалка, килимок)'] }}\n\nОформи результат як звичайний текст. Не використовуй HTML або посилання.  \nСтруктуруй план по тижнях і днях, вказуючи вправи та, за бажанням, повторення або тривалість."
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {
+          "maxTokens": 10000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        304,
+        -48
+      ],
+      "id": "ed1218f4-a1c5-4912-abef-ea91d5340605",
+      "name": "Професійний тренер",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Ти — HTML-верстальник та фітнес-редактор. Твоє завдання — взяти текстовий план тренувань та перетворити його у чистий HTML-документ для подальшого експорту в PDF.\n\n❗ Важливо: відповідь має бути **повним HTML-документом**. Починай з `<!DOCTYPE html>`, включи теги `<html>`, `<head>`, `<body>`. Відповідь повинна містити **лише HTML-код**, без вступних фраз чи пояснень.\n\n❗ Не обгортай HTML у Markdown-блоки (тобто без html і ) — поверни чистий HTML-код.\n\nСформатуй наступний 4-тижневий план тренувань у структурований HTML-документ.\n\n- Використовуй <h1> для заголовку, <h2> для тижнів.\n- Для вправ використовуй <ul><li> списки.\n- Назву кожної вправи обгорни в посилання на Google, наприклад:\n  <a href=\"https://www.google.com/search?q=Віджимання\">Віджимання</a>\n- HTML має бути мінімальним, без стилів, тільки структура.\n\nПлан тренувань:\n{{ $json.choices[0].message.content }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {
+          "maxTokens": 10000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        304,
+        80
+      ],
+      "id": "507bd1c9-40c3-4b67-ac1e-6c950c25db5b",
+      "name": "HTML верстальник",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pdfshift.io/v3/convert/pdf",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key"
+            },
+            {
+              "name": "Content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"source\": {{ JSON.stringify($('HTML верстальник').item.json.choices[0].message.content) }},\n  \"landscape\": false,\n  \"use_print\": true,\n  \"margin\": \"1cm\",\n  \"pages\": \"1-\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        304
+      ],
+      "id": "9c08f24a-a9a3-443c-aa4b-b87e587cd57f",
+      "name": "HTML to PDF"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c0da7b86-44df-4bf1-adc4-5b1ee3faeb3e",
+              "name": "completion_tokens",
+              "value": "={{ $('Професійний тренер').first().json.usage.completion_tokens + $json.usage.completion_tokens }}",
+              "type": "number"
+            },
+            {
+              "id": "c053adc5-d061-49e0-bcc3-af904dad162c",
+              "name": "prompt_tokens",
+              "value": "={{ $json.usage.prompt_tokens + $('Професійний тренер').first().json.usage.prompt_tokens }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        304
+      ],
+      "id": "45c2a0c8-ec16-401f-8a21-735340477676",
+      "name": "ціна генерації плану"
+    },
+    {
+      "parameters": {
+        "name": "={{ $now.format('yyyy-MM-dd') }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1gNqyldrIk5v8OG5r9LC41QoOnJ33bMPq",
+          "mode": "list",
+          "cachedResultName": "Тренування",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1gNqyldrIk5v8OG5r9LC41QoOnJ33bMPq"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        624,
+        304
+      ],
+      "id": "67711b09-778f-4c9b-99a2-14a5e3111232",
+      "name": "Google Drive",
+      "credentials": {}
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Професійний тренер",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Професійний тренер": {
+      "main": [
+        [
+          {
+            "node": "HTML верстальник",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML верстальник": {
+      "main": [
+        [
+          {
+            "node": "ціна генерації плану",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ціна генерації плану": {
+      "main": [
+        [
+          {
+            "node": "HTML to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML to PDF": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7ff3d55b-02bf-4063-af0d-b47d79aff79c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c23a816965dd7142d39c31f3ac0263da3d17c48e067f721567e0849a8b61549"
+  },
+  "id": "v7dfwxklQscRMsjL",
+  "tags": []
+}

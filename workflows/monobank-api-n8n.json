@@ -1,0 +1,1025 @@
+{
+  "name": "Monobank + n8n",
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "67339357-54ac-41bb-b7eb-7b614bb1fdd2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        -224
+      ],
+      "id": "972870ab-e981-406c-8f1e-ac3d5cd5cbdd",
+      "name": "Webhook",
+      "webhookId": "67339357-54ac-41bb-b7eb-7b614bb1fdd2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        464,
+        -240
+      ],
+      "id": "e8526a6b-7356-4d2b-9ca9-5f23cb792a08",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.monobank.ua/personal/webhook",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"webHookUrl\": \"<webhook>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        -240
+      ],
+      "id": "b96b79f2-ca19-40de-ad8e-a43c575aa088",
+      "name": "Визначання вебхука",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "content": "## 3. Вхідні транзакції",
+        "height": 496,
+        "width": 1200,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -144,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "bb9b6613-7f73-4d63-9e7d-6df9a68f3aae",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 2. Реєстрація вебхука",
+        "height": 256,
+        "width": 704,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "d684103c-ab3c-40aa-833f-ecc74004e9e2",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        608
+      ],
+      "id": "b0ce85a9-ebae-4e44-a83f-85311c735b4f",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM",
+          "mode": "list",
+          "cachedResultName": "Monobank",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1741051302,
+          "mode": "list",
+          "cachedResultName": "Витрати",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM/edit#gid=1741051302"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "date",
+              "lookupValue": "={{ $now.format('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        96,
+        528
+      ],
+      "id": "3eae3d9a-a178-4df2-a2fb-f00f7d8e204d",
+      "name": "транзакції2",
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM",
+          "mode": "list",
+          "cachedResultName": "Monobank",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1865962861,
+          "mode": "list",
+          "cachedResultName": "Дохід",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM/edit#gid=1865962861"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "date",
+              "lookupValue": "={{ $now.format('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        96,
+        704
+      ],
+      "id": "7cf193a1-6552-475c-a46a-2b16b6d09db7",
+      "name": "транзакції3",
+      "credentials": {
+
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 4. Звіт",
+        "height": 400,
+        "width": 1184,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        480
+      ],
+      "typeVersion": 1,
+      "id": "7936f974-1a1d-408c-9122-992e682d263e",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        224,
+        -240
+      ],
+      "id": "f399a6f9-c0bc-4064-a021-4d46c1e8d2f9",
+      "name": "Success 200"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b0a9365d-9b83-47ee-a631-b3c4c22c699b",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "={{ $('Webhook').item.json.body.data.account }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        144
+      ],
+      "id": "076830a4-1041-4ef3-9665-ba0b4a44b57a",
+      "name": "фільтрація карт"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "accounts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        208,
+        144
+      ],
+      "id": "2f647116-fa22-4b50-8026-1bd163e060af",
+      "name": "карти"
+    },
+    {
+      "parameters": {
+        "url": "https://api.monobank.ua/personal/client-info",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        48,
+        144
+      ],
+      "id": "010aa8ac-f212-492d-90e9-899c73200f21",
+      "name": "інфа про клієнта",
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM",
+          "mode": "list",
+          "cachedResultName": "Monobank",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1741051302,
+          "mode": "list",
+          "cachedResultName": "Витрати",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM/edit#gid=1741051302"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "maskedPan": "={{ $('фільтрація карт').item.json.maskedPan[0] }}",
+            "account": "={{ $('Webhook').item.json.body.data.account }}",
+            "id": "={{ $('Webhook').item.json.body.data.statementItem.id }}",
+            "time": "={{ new Date($('Webhook').item.json.body.data.statementItem.time * 1000).toISOString().split('T')[1].split('.')[0] }}",
+            "description": "={{ $('Webhook').item.json.body.data.statementItem.description }}",
+            "mcc": "={{ $('Webhook').item.json.body.data.statementItem.mcc }}",
+            "originalMcc": "={{ $('Webhook').item.json.body.data.statementItem.originalMcc }}",
+            "amount": "={{ $('Webhook').item.json.body.data.statementItem.amount }}",
+            "operationalAmount": "={{ $('Webhook').item.json.body.data.statementItem.operationAmount }}",
+            "currencyCode": "={{ $('Webhook').item.json.body.data.statementItem.currencyCode }}",
+            "commisionRate": "={{ $('Webhook').item.json.body.data.statementItem.commissionRate }}",
+            "cashbackAmmount": "={{ $('Webhook').item.json.body.data.statementItem.cashbackAmount }}",
+            "balance": "={{ $('Webhook').item.json.body.data.statementItem.balance }}",
+            "hold": "={{ $('Webhook').item.json.body.data.statementItem.hold }}",
+            "type": "={{ $json.type }}",
+            "date": "={{ new Date($('Webhook').item.json.body.data.statementItem.time * 1000).toISOString().split('T')[0] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "account",
+              "displayName": "account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mcc",
+              "displayName": "mcc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "originalMcc",
+              "displayName": "originalMcc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "amount",
+              "displayName": "amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "operationalAmount",
+              "displayName": "operationalAmount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "currencyCode",
+              "displayName": "currencyCode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "commisionRate",
+              "displayName": "commisionRate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cashbackAmmount",
+              "displayName": "cashbackAmmount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "balance",
+              "displayName": "balance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hold",
+              "displayName": "hold",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "maskedPan",
+              "displayName": "maskedPan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        720,
+        64
+      ],
+      "id": "8eb1c18b-2a4d-41cc-a860-e12e08007e6b",
+      "name": "Збереження витрати",
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM",
+          "mode": "list",
+          "cachedResultName": "Monobank",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1865962861,
+          "mode": "list",
+          "cachedResultName": "Дохід",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rmQVw0_a474mNVvKns9zbS9R0v8-us3DIQRbYp39XlM/edit#gid=1865962861"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "maskedPan": "={{ $('фільтрація карт').item.json.maskedPan[0] }}",
+            "account": "={{ $('Webhook').item.json.body.data.account }}",
+            "id": "={{ $('Webhook').item.json.body.data.statementItem.id }}",
+            "time": "={{ new Date($('Webhook').item.json.body.data.statementItem.time * 1000).toISOString().split('T')[1].split('.')[0] }}",
+            "description": "={{ $('Webhook').item.json.body.data.statementItem.description }}",
+            "mcc": "={{ $('Webhook').item.json.body.data.statementItem.mcc }}",
+            "originalMcc": "={{ $('Webhook').item.json.body.data.statementItem.originalMcc }}",
+            "amount": "={{ $('Webhook').item.json.body.data.statementItem.amount }}",
+            "operationalAmount": "={{ $('Webhook').item.json.body.data.statementItem.operationAmount }}",
+            "currencyCode": "={{ $('Webhook').item.json.body.data.statementItem.currencyCode }}",
+            "commisionRate": "={{ $('Webhook').item.json.body.data.statementItem.commissionRate }}",
+            "cashbackAmmount": "={{ $('Webhook').item.json.body.data.statementItem.cashbackAmount }}",
+            "balance": "={{ $('Webhook').item.json.body.data.statementItem.balance }}",
+            "hold": "={{ $('Webhook').item.json.body.data.statementItem.hold }}",
+            "type": "={{ $json.type }}",
+            "date": "={{ new Date($('Webhook').item.json.body.data.statementItem.time * 1000).toISOString().split('T')[0] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "account",
+              "displayName": "account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mcc",
+              "displayName": "mcc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "originalMcc",
+              "displayName": "originalMcc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "amount",
+              "displayName": "amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "operationalAmount",
+              "displayName": "operationalAmount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "currencyCode",
+              "displayName": "currencyCode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "commisionRate",
+              "displayName": "commisionRate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cashbackAmmount",
+              "displayName": "cashbackAmmount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "balance",
+              "displayName": "balance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hold",
+              "displayName": "hold",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "maskedPan",
+              "displayName": "maskedPan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        720,
+        208
+      ],
+      "id": "84b86a51-522a-406d-962b-a5c4f0829a5c",
+      "name": "Збереження прибутку",
+      "credentials": {
+
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d840d131-d30a-45c3-a1a2-4a48f33cf979",
+              "leftValue": "={{ $('Webhook').item.json.body.data.statementItem.amount }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        144
+      ],
+      "id": "f0ce34e3-81bc-441c-94bc-bea6a74b8d09",
+      "name": "Прибуток чи витрата?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// MCC довідник\nconst mccMap = {\n  4829: 'Грошові перекази',\n  5411: 'Продуктові магазини',\n  5812: 'Ресторани',\n  6011: 'Банкомати',\n  4111: 'Пасажирський транспорт',\n};\n\n// Валюти\nconst currencyMap = {\n  980: 'UAH',\n  840: 'USD',\n  978: 'EUR',\n};\n\nreturn items.map(item => {\n  const input = item.json;\n  return {\n    json: {\n      ...input,\n      pretified: {\n        mcc_description: mccMap[input.mcc] || 'Невідомий MCC',\n        amount: (input.amount / 100).toFixed(2),\n        currency: currencyMap[input.currencyCode] || input.currencyCode,\n        balance: (input.balance / 100).toFixed(2)\n      }\n    }\n  }\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        624
+      ],
+      "id": "68c375b2-3aa0-4443-9608-7df933ea292a",
+      "name": "розшифровка"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "sum",
+              "field": "amount"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "maskedPan",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        624
+      ],
+      "id": "13962386-eeaa-4d12-8296-e4979e3dee0d",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "sum_amount"
+            },
+            {
+              "fieldToAggregate": "maskedPan"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        544,
+        624
+      ],
+      "id": "2b34146d-5c89-4b4e-8087-cbb24794b0bb",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "<chatId>",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        624
+      ],
+      "id": "34f26212-fbed-4ffa-b58c-260c7f9101a6",
+      "name": "sent to tg1",
+      "webhookId": "1bb3a37f-7737-472c-a44a-34c4b3b8f4a8",
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 1. Вебхук",
+        "height": 256,
+        "width": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -144,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "7f9bdfd4-9ba1-4c2b-8fd5-b5352e22e16c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "=https://quickchart.io/chart/render/zm-0ab6337ba-b3f6-4f104-974d-aa08a7246e55d?title=An interesting chart&labels={{ $json.maskedPan }}&data1={{ $json.sum_amount }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        688,
+        624
+      ],
+      "id": "60cad8c0-a505-4746-843f-7c534e1a2a4e",
+      "name": "quickchart"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Success 200",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "інфа про клієнта",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Визначання вебхука",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "транзакції2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "транзакції3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "транзакції2": {
+      "main": [
+        [
+          {
+            "node": "розшифровка",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "транзакції3": {
+      "main": [
+        [
+          {
+            "node": "розшифровка",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "фільтрація карт": {
+      "main": [
+        [
+          {
+            "node": "Прибуток чи витрата?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "карти": {
+      "main": [
+        [
+          {
+            "node": "фільтрація карт",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "інфа про клієнта": {
+      "main": [
+        [
+          {
+            "node": "карти",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Прибуток чи витрата?": {
+      "main": [
+        [
+          {
+            "node": "Збереження витрати",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Збереження прибутку",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "розшифровка": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "quickchart",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "quickchart": {
+      "main": [
+        [
+          {
+            "node": "sent to tg1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "edbd2f22-e86c-4890-83fa-9ae75424268a",
+  "meta": {
+    "instanceId": "4c23a816965dd7142d39c31f3ac0263da3d17c48e067f721567e0849a8b61549"
+  },
+  "id": "N5268I3UpEUC7AFO",
+  "tags": []
+}

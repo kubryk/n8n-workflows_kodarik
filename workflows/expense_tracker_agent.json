@@ -1,0 +1,1072 @@
+{
+  "name": "Контроль витрат",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -580,
+        120
+      ],
+      "id": "d6da2202-a3ff-463d-942d-acadbbd4fa78",
+      "name": "Telegram Trigger",
+      "webhookId": "5d536db5-0f87-4b1d-b787-4a5cb6f44fe8",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/{{ $('.env').item.json.bot_token }}/getFile?file_id={{ $json.message.photo[3].file_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -100,
+        -180
+      ],
+      "id": "8bffaa94-d160-4584-9c61-43f4631403ab",
+      "name": "get photo link"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "=Проаналізуй це зображення квитанції та витягни такі дані:\n\t•\tstore_name: назва магазину або компанії, що видала квитанцію\n\t•\tdescription: короткий загальний опис покупки одним словом (наприклад, “продукти”, “техніка”, “одяг”, “аптека”)\n\t•\tdate: дата покупки у форматі YYYY-MM-DD\n\t•\tpayment_method: метод оплати (наприклад, “картка”, “готівка”, “Apple Pay”)\n\t•\ttotal_amount: сума покупки як число (без валюти)\n\t•\tcurrency: валюта (наприклад, “UAH”, “USD”, “EUR”)\n\n\n\n\n🔴 Поверни тільки JSON без жодного пояснення, тексту або форматування перед/після.\n🔴 Якщо якихось даних немає — вкажи \"unknown\" або null, але не вигадуй.\n🔴 Формат:\n{\n  \"store_name\": \"string\",\n  \"description\": \"string\",\n  \"date\": \"YYYY-MM-DD\",\n  \"payment_method\": \"string\",\n  \"total_amount\": number,\n  \"currency\": \"string\",\n  \"user\": \"12345\",\n  \"user_name\": \"businka\"\n}",
+        "imageUrls": "=https://api.telegram.org/file/{{ $('.env').item.json.bot_token }}/{{ $('get photo link').item.json.result.file_path }}",
+        "options": {
+          "maxTokens": 500
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        380,
+        -180
+      ],
+      "id": "c51b9e97-075b-4bed-bd4a-7ba0b99c0db7",
+      "name": "OpenAI1",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.photo }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "0abee9bb-5d60-450b-ad89-21011160797f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "photo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e5fb290a-516b-4e7e-b9e6-efb87a2afe64",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "message"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "eee6dbd7-37f1-4584-b33c-a2db2e16f88f",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -300,
+        120
+      ],
+      "id": "2abef77a-a390-4946-83c1-643ef223f3da",
+      "name": "photo or video"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ JSON.stringify($json.content) }}\n",
+        "options": {
+          "systemMessage": "=Ти — асистент, який приймає структуру фінансової транзакції (витрата або дохід). Твоя задача — додати новий рядок у відповідну Google Таблицю: *витрати* або *доходи*.\n\nСьогоднішня дата: {{ $now }}  \nЯкщо користувач не вказує дату — використовуй сьогоднішню.\n\n🔹 Якщо транзакція — це **витрата**, її структура має бути такою:\n{\n  \"store_name\": \"АТБ-Маркет\",\n  \"description\": \"продукти\",\n  \"date\": \"2025-07-14\",\n  \"payment_method\": \"картка\",\n  \"total_amount\": 254.60,\n  \"currency\": \"UAH\",\n  \"user_id\": \"12345\",\n  \"user_name\": \"businka\",\n  \"photo\": \"https://...\"\n}\n\n✅ Використай інструмент `google_sheets.append_row` і передай дані в таблицю витрат.\n\n✅ Після запису поверни відповідь у форматі markdown:\n🧾 *Нова покупка додана:*  \n🏬 Магазин: АТБ-Маркет  \n🛍️ Опис: продукти  \n📅 Дата: 2025-07-14  \n💳 Оплата: картка  \n💰 Сума: 254.60 UAH  \n\nСума витрат за сьогодні: 500 UAH\n\n---\n\n🔹 Якщо транзакція — це **дохід**, структура така:\n{\n  \"source_name\": \"Upwork\",\n  \"description\": \"фріланс\",\n  \"date\": \"2025-07-14\",\n  \"payment_method\": \"PayPal\",\n  \"amount\": 850.00,\n  \"currency\": \"USD\",\n  \"user_id\": \"12345\",\n  \"user_name\": \"businka\"\n}\n\n✅ Використай інструмент `google_sheets.append_row` і передай дані в таблицю доходів.\n\n✅ Після запису поверни у форматі markdown:\n💰 *Новий дохід додано:*  \n📥 Джерело: Upwork  \n📝 Опис: фріланс  \n📅 Дата: 2025-07-14  \n💳 Отримано через: PayPal  \n💵 Сума: 850.00 USD  \n\nСума доходів за сьогодні: 1300 USD\n\n---\n\n❗ Якщо користувач хоче дізнатись загальну суму витрат або доходів за певний період:\n– Використай інструмент `get_rows_by_date`  \n– Порахуй загальну суму по відповідному типу (витрати або доходи)  \n– Поверни відповідь у markdown-форматі\n\n🔴 Не змінюй значень і не додавай жодного тексту від себе. Якщо якісь значення `null` або `unknown` — все одно записуй їх у таблицю."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        780,
+        120
+      ],
+      "id": "4995effc-5e79-4f23-ae41-d3bf1059c57d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/{{ $('.env').item.json.bot_token }}/{{ $json.result.file_path }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        -180
+      ],
+      "id": "00a907ed-2994-469b-b131-ec54b2c40b20",
+      "name": "get photo"
+    },
+    {
+      "parameters": {
+        "name": "={{ $now }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-driver"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1GBlQY2-sTCqT9wOOb8D0WjmZ9vRNu_Am",
+          "mode": "list",
+          "cachedResultName": "квитанції",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1GBlQY2-sTCqT9wOOb8D0WjmZ9vRNu_Am1"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        220,
+        -180
+      ],
+      "id": "3be36e41-b79f-4088-9d7f-7b032b0d0d21",
+      "name": "upload to Google Drive",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "jsCode": "// Отримуємо content як рядок JSON\nconst contentStr = $json[\"content\"] || '{}';\nlet contentObj = {};\n\ntry {\n  contentObj = JSON.parse(contentStr);\n} catch (e) {\n  // Якщо парсинг не вдалий — залишаємо пустий обʼєкт\n  contentObj = {};\n}\n\n// Додаємо додаткові поля з інших нод (з безпечним доступом)\ncontentObj.photo = $node[\"upload to Google Drive\"]?.json?.webViewLink || null;\ncontentObj.user_id = $node[\"Telegram Trigger\"]?.json?.message?.from?.id || null;\ncontentObj.user_name = $node[\"Telegram Trigger\"]?.json?.message?.chat?.first_name || null;\n\n// Повертаємо новий обʼєкт в полі content\nreturn [{ json: { content: contentObj } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        -180
+      ],
+      "id": "82653c39-9574-43af-a9b0-b79e67ef38fa",
+      "name": "input data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76e7c416-7988-4af5-95f2-c0833cc59bb8",
+              "name": "content",
+              "value": "={{ \n{\n  \"user_text\": $json.message.text,\n  \"user_id\": $json.message.chat.id,\n  \"user_name\": $json.message.chat.first_name\n} \n}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        120
+      ],
+      "id": "2064c9e7-f290-4733-af68-c7978339eafc",
+      "name": "input data1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "06bfc1b7-8342-4227-b266-fa39084905b8",
+              "name": "elevenlabs_key",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "2d3692e3-1349-44b6-93ea-28490c08c954",
+              "name": "bot_token",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -440,
+        120
+      ],
+      "id": "8ef5c12b-f5df-434c-93c1-8e35a30d95a0",
+      "name": ".env"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/{{ $('.env').item.json.bot_token }}/getFile?file_id={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -40,
+        420
+      ],
+      "id": "00535030-11c2-4a1c-9254-0164414704ec",
+      "name": "get audio link"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/{{ $('.env').item.json.bot_token }}/{{ $json.result.file_path }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        120,
+        420
+      ],
+      "id": "1c02814f-21ac-468a-bc14-c46c4fdf1453",
+      "name": "get audio"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/speech-to-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "={{ $('.env').item.json.elevenlabs_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "model_id",
+              "value": "scribe_v1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        420
+      ],
+      "id": "f3f007b4-405f-4d5a-9340-fdafc8bf89e4",
+      "name": "speech to text"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a86ebd8a-0582-4c13-b150-845d84d94a69",
+              "name": "content",
+              "value": "={{ \n{\n  \"user_text\": $json.text,\n  \"user_id\": $('Telegram Trigger').item.json.message.chat.id,\n  \"user_name\": $('Telegram Trigger').item.json.message.from.first_name\n} \n}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        420
+      ],
+      "id": "5963f9c3-d111-461d-94ba-8c7adbac4229",
+      "name": "input data2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU",
+          "mode": "list",
+          "cachedResultName": "Трекер фінансів",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU/edit?usp=drivesdk1"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 467359686,
+          "mode": "list",
+          "cachedResultName": "Доходи",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU/edit#gid=4673596861"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "source_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('source_name', ``, 'string') }}",
+            "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', ``, 'string') }}",
+            "date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('date', ``, 'string') }}",
+            "payment_method": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('payment_method', ``, 'string') }}",
+            "total_amount": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('total_amount', ``, 'string') }}",
+            "currency": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('currency', ``, 'string') }}",
+            "user_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('user_id', ``, 'string') }}",
+            "user_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('user_name', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "source_name",
+              "displayName": "source_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "payment_method",
+              "displayName": "payment_method",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "total_amount",
+              "displayName": "total_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currency",
+              "displayName": "currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        1380,
+        480
+      ],
+      "id": "3de58d4c-f4ea-4c23-a7d7-9bb77f432f8b",
+      "name": "add_income",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU",
+          "mode": "list",
+          "cachedResultName": "Трекер фінансів",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU/edit?usp=drivesdk1"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Витрати",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU/edit#gid=01"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "store_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('store_name', ``, 'string') }}",
+            "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', ``, 'string') }}",
+            "date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('date', ``, 'string') }}",
+            "photo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('photo', ``, 'string') }}",
+            "payment_method": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('payment_method', ``, 'string') }}",
+            "total_amount": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('total_amount', ``, 'string') }}",
+            "currency": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('currency', ``, 'string') }}",
+            "user_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('user_id', ``, 'string') }}",
+            "user_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('user_name', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "store_name",
+              "displayName": "store_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "photo",
+              "displayName": "photo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "payment_method",
+              "displayName": "payment_method",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "total_amount",
+              "displayName": "total_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currency",
+              "displayName": "currency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        1000,
+        480
+      ],
+      "id": "e6e447ce-a1b4-4b79-b91d-ccdbfc0a0cb0",
+      "name": "add_outcome",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU",
+          "mode": "list",
+          "cachedResultName": "Трекер фінансів",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU/edit?usp=drivesdk1"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Витрати",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU/edit#gid=01"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "date",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        1160,
+        480
+      ],
+      "id": "89f7e558-33f9-47e6-a171-bb88a2dfd562",
+      "name": "get_outcome_by_date",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU",
+          "mode": "list",
+          "cachedResultName": "Трекер фінансів",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU/edit?usp=drivesdk1"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 467359686,
+          "mode": "list",
+          "cachedResultName": "Доходи",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16y6WstsDR4maUBWL2cy0Oc0y9RheEdRdnBF_V50uyuU/edit#gid=4673596861"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "date",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        1540,
+        480
+      ],
+      "id": "d8706b56-f2ea-4293-9e62-0fa1b925e53b",
+      "name": "get_income_by_date",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "content": "## Витрати",
+        "height": 240,
+        "width": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        400
+      ],
+      "typeVersion": 1,
+      "id": "271cfe9d-fbde-4741-8ae3-e8afcfee6b70",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Прибутки",
+        "height": 240,
+        "width": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1340,
+        400
+      ],
+      "typeVersion": 1,
+      "id": "9dc33e5a-2e75-405a-9806-20e9ead42b2a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Аудіо",
+        "height": 260,
+        "width": 840
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -140,
+        360
+      ],
+      "typeVersion": 1,
+      "id": "09f9d48f-4605-4f16-9161-ddea9b3ad888",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Фото",
+        "height": 260,
+        "width": 840
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -140,
+        -260
+      ],
+      "typeVersion": 1,
+      "id": "102e7b62-33dd-423c-b927-8801e3b1bf7c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Текст",
+        "height": 240,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        60,
+        60
+      ],
+      "typeVersion": 1,
+      "id": "cc644776-d38b-4d5f-abc3-d0ba15eef85d",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        740,
+        300
+      ],
+      "id": "e5f83d34-c360-47da-95a1-480a34fe1fe5",
+      "name": "OpenAI",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        840,
+        300
+      ],
+      "id": "d453fb49-ea68-4279-b4a9-adebf269f5df",
+      "name": "Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        120
+      ],
+      "id": "bc4dfc59-b847-4078-9b5e-a52e6130e674",
+      "name": "respond to client",
+      "webhookId": "938bb349-46d0-404f-8bd7-411f7696511b",
+      "credentials": {}
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "get photo link": {
+      "main": [
+        [
+          {
+            "node": "get photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "photo or video": {
+      "main": [
+        [
+          {
+            "node": "get photo link",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "input data1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get audio link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": ".env",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "input data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "respond to client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get photo": {
+      "main": [
+        [
+          {
+            "node": "upload to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upload to Google Drive": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "input data": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "input data1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".env": {
+      "main": [
+        [
+          {
+            "node": "photo or video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get audio link": {
+      "main": [
+        [
+          {
+            "node": "get audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get audio": {
+      "main": [
+        [
+          {
+            "node": "speech to text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "speech to text": {
+      "main": [
+        [
+          {
+            "node": "input data2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "input data2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add_income": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add_outcome": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_outcome_by_date": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_income_by_date": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "11d76841-9fa4-4ccd-a1dd-4ca585d0d220",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c23a816965dd7142d39c31f3ac0263da3d17c48e067f721567e0849a8b61549"
+  },
+  "id": "v7t5ulQ7X1bV3e5t",
+  "tags": []
+}

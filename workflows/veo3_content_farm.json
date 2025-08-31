@@ -1,0 +1,993 @@
+{
+  "name": "VEO3 Content Farm",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Ідея та промпт",
+        "height": 404,
+        "width": 1200,
+        "color": 6
+      },
+      "id": "edaa1347-1b2a-419a-ad8f-9722e488bfe0",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -176,
+        416
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# Створення відео Veo3\n\n",
+        "height": 280,
+        "width": 1024,
+        "color": 3
+      },
+      "id": "395ce0ee-bd27-4db7-ab71-7fd60cfe50fc",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1040,
+        544
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://backend.blotato.com/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"post\": {\n    \"accountId\": \"{{ $('ID соцмереж').item.json.instagram_id }}\",\n    \"target\": {\n      \"targetType\": \"instagram\"\n    },\n    \"content\": {\n      \"text\": \"Wow!\",\n      \"platform\": \"instagram\",\n      \"mediaUrls\": [\n        \"{{ $json.url }}\"\n      ]\n    }\n  }\n}\n\n",
+        "options": {}
+      },
+      "id": "c9c7d3e9-3b62-4ad4-91ee-ed11675e2bb6",
+      "name": "INSTAGRAM",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        400,
+        1168
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://backend.blotato.com/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"post\": {\n    \"accountId\": \"{{ $('ID соцмереж').item.json.youtube_id }}\",\n    \"target\": {\n      \"targetType\": \"youtube\",\n      \"title\": \"{{ $('Дістаєм інфу про відео').item.json.Titre }}\",\n      \"privacyStatus\": \"unlisted\",\n      \"shouldNotifySubscribers\": \"false\"\n    },\n    \"content\": {\n      \"text\": \"{{ $('Дістаєм інфу про відео').item.json.DESCRIPTION }}\",\n      \"platform\": \"youtube\",\n      \"mediaUrls\": [\n        \"{{ $json.url }}\"\n      ]\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "id": "3c61c327-5ed4-497b-9563-6371cc43a2c9",
+      "name": "YOUTUBE",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1440,
+        1168
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://backend.blotato.com/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"post\": {\n    \"accountId\": \"{{ $('ID соцмереж').item.json.tiktok_id }}\",\n    \"target\": {\n      \"targetType\": \"tiktok\",\n      \"isYourBrand\": \"false\", \n      \"disabledDuet\": \"false\",\n      \"privacyLevel\": \"PUBLIC_TO_EVERYONE\",\n      \"isAiGenerated\": \"true\",\n      \"disabledStitch\": \"false\",\n      \"disabledComments\": \"false\",\n      \"isBrandedContent\": \"false\"\n      \n    },\n    \"content\": {\n      \"text\": \"{{ $('Дістаєм інфу про відео').item.json.DESCRIPTION }}\",\n      \"platform\": \"tiktok\",\n      \"mediaUrls\": [\n        \"{{ $json.url }}\"\n      ]\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "id": "82be4cb0-0872-41ae-901e-c616121269cd",
+      "name": "TIKTOK",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1648,
+        1168
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://backend.blotato.com/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"post\": {\n    \"accountId\": \"{{ $('ID соцмереж').item.json.facebook_id }}\",\n    \"target\": {\n      \"targetType\": \"facebook\",\n      \"pageId\": \"{{ $('ID соцмереж').item.json.facebook_page_id }}\"\n\n      \n    },\n    \"content\": {\n      \"text\": \"{{ $('Дістаєм інфу про відео').item.json.DESCRIPTION }}\",\n      \"platform\": \"facebook\",\n      \"mediaUrls\": [\n        \"{{ $json.url }}\"\n      ]\n    }\n  }\n}",
+        "options": {}
+      },
+      "id": "79b348aa-7f31-48b6-a811-1d0a6cd9cc2b",
+      "name": "FACEBOOK",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        608,
+        1168
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://backend.blotato.com/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"post\": {\n    \"accountId\": \"{{ $('ID соцмереж').item.json.threads_id }}\",\n    \"target\": {\n      \"targetType\": \"threads\"\n      \n    },\n    \"content\": {\n      \"text\": \"{{ $('Дістаєм інфу про відео').item.json.DESCRIPTION }}\",\n      \"platform\": \"threads\",\n      \"mediaUrls\": [\n        \"{{ $json.url }}\"\n      ]\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "id": "9ff56b5a-ab10-4f74-a5de-2ba1d6bfca33",
+      "name": "THREADS",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        816,
+        1168
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://backend.blotato.com/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"post\": {\n    \"accountId\": \"{{ $('ID соцмереж').item.json.linkedin_id }}\",\n    \"target\": {\n      \"targetType\": \"linkedin\"\n      \n    },\n    \"content\": {\n      \"text\": \"{{ $('Дістаєм інфу про відео').item.json.DESCRIPTION }}\",\n      \"platform\": \"linkedin\",\n      \"mediaUrls\": [\n        \"{{ $json.url }}\"\n      ]\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "id": "810dbdce-ed26-4780-89c1-effeb2b3f317",
+      "name": "LINKEDIN",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1872,
+        1168
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://backend.blotato.com/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"post\": {\n    \"accountId\": \"{{ $('ID соцмереж').item.json.pinterest_id }}\",\n    \"target\": {\n      \"targetType\": \"pinterest\",\n      \"boardId\": \"{{ $('ID соцмереж').item.json.pinterest_board_id }}\"      \n    },\n    \"content\": {\n      \"text\": \"{{ $('Дістаєм інфу про відео').item.json.DESCRIPTION }}\",\n      \"platform\": \"pinterest\",\n      \"mediaUrls\": [\n        \"{{ $json.url }}\"\n      ]\n    }\n  }\n}\n\n",
+        "options": {}
+      },
+      "id": "38597abc-f801-466d-885f-5a4543960646",
+      "name": "PINTEREST",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1024,
+        1168
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "content": "# Публікація\n",
+        "height": 536,
+        "width": 2240,
+        "color": 4
+      },
+      "id": "62ebd9cd-dd1a-450c-82c9-075dd2079fd7",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -176,
+        864
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "4f73b299-e4b1-42ca-97dd-6642f26f0f6b",
+      "name": "Trigger: Run Daily Script Generator",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -16,
+        496
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://backend.blotato.com/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"post\": {\n    \"accountId\": \"{{ $('ID соцмереж').item.json.twitter_id }}\",\n    \"target\": {\n      \"targetType\": \"twitter\"\n      \n    },\n    \"content\": {\n      \"text\": \"{{ $('Дістаєм інфу про відео').item.json.DESCRIPTION }}\",\n      \"platform\": \"twitter\",\n      \"mediaUrls\": [\n        \"{{ $json.url }}\"\n      ]\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "id": "31d5ea60-96ba-4c98-936d-9f68d529b84f",
+      "name": "X (Twitter)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1232,
+        1168
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Give me an idea about [a Yeti speaking to a camera and doing a Vlog through his selfie stick]. ",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an AI designed to generate 1 immersive, realistic idea based on a user-provided topic. Your output must be formatted as a JSON array (single line) and follow all the rules below exactly.\n\nRULES:\n\nOnly return 1 idea at a time.\n\nThe user will provide a key topic (e.g. “urban farming,” “arctic survival,” “street food in Vietnam”).\n\nThe Idea must:\n\nBe under 13 words.\n\nDescribe an interesting and viral-worthy moment, action, or event related to the provided topic.\n\nCan be as surreal as you can get, doesn't have to be real-world!\n\nInvolves a character.\n\nThe Caption must be:\n\nShort, punchy, and viral-friendly.\n\nInclude one relevant emoji.\n\nInclude exactly 12 hashtags in this order:\n** 4 topic-relevant hashtags\n** 4 all-time most popular hashtags\n** 4 currently trending hashtags (based on live research)\n\nAll hashtags must be lowercase.\n\nSet Status to \"for production\" (always).\n\nThe Environment must:\n\nBe under 20 words.\n\nMatch the action in the Idea exactly.\n\nClearly describe:\n\nWhere the event is happening (e.g. rooftop, jungle trail, city alley, frozen lake)\n\nKey visuals or background details (e.g. smoke rising, neon lights, fog, birds overhead)\n\nMain participants (e.g. farmer, cook, mechanic, rescue team, animal)\n\nStyle of scene (e.g. cinematic realism, handheld docu-style, aerial tracking shot, macro close-up)\n\nOk with fictional settings\n\nOUTPUT FORMAT (single-line JSON array):\n\n\n[\n  {\n    \"Caption\": \"Short viral title with emoji #4_topic_hashtags #4_all_time_popular_hashtags #4_trending_hashtags\",\n    \"Idea\": \"Short idea under 13 words\",\n    \"Environment\": \"Brief vivid setting under 20 words matching the action\",\n    \"Status\": \"for production\"\n  }\n]\n"
+        }
+      },
+      "id": "9456e478-54f9-4a39-97a7-1686b7802af0",
+      "name": "Генерація ідеї",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        144,
+        496
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c",
+          "mode": "list",
+          "cachedResultName": "Контент машина",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "==ROW()-1",
+            "idea": "={{ $json.output[0].Idea }}",
+            "caption": "={{ $json.output[0].Caption }}",
+            "production": "={{ $json.output[0].Status }}",
+            "environment_prompt": "={{ $json.output[0].Environment }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "idea",
+              "displayName": "idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "production",
+              "displayName": "production",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "environment_prompt",
+              "displayName": "environment_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "final_output",
+              "displayName": "final_output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "05970896-0a2a-4aac-a2a2-a86d46be9114",
+      "name": "Збереження ідеї",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        480,
+        496
+      ],
+      "typeVersion": 4.5,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "id": "78a66e5b-cc29-4593-bf34-deb31c4f0da1",
+      "name": "GPT-4.1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        96,
+        688
+      ],
+      "typeVersion": 1.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n    \"Caption\": \"Diver Removes Nets Off Whale 🐋 #whalerescue #marinelife #oceanrescue #seahelpers #love #nature #instagood #explore #viral #savenature #oceanguardians #cleanoceans\",\n    \"Idea\": \"Diver carefully cuts tangled net from distressed whale in open sea\",\n    \"Environment\": \"Open ocean, sunlight beams through water, diver and whale, cinematic realism\",\n    \"Status\": \"for production\"\n  }\n]\n"
+      },
+      "id": "c4118498-c270-4d20-8ddb-def16d6f159b",
+      "name": "Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        352,
+        688
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "id": "a8effd2d-3c56-4f2c-bee4-948ee8e62ee3",
+      "name": "(GPT-4.1)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        672,
+        688
+      ],
+      "typeVersion": 1.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Give me a Veo3 prompt for this idea:\n{{ $json.idea }}\n\nThis is the environment:\n{{ $json.environment_prompt }}\n\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=SYSTEM PROMPT FOR GOOGLE VEO3 PROMPT AGENT\n\nYou are an AI agent that writes hyper-realistic, cinematic video prompts for Google VEO3. Each prompt should describe a short, vivid selfie-style video clip featuring one unnamed character speaking or acting in a specific moment. The final video should look like found footage or documentary-style film — grounded, realistic, and immersive.\n\nREQUIRED STRUCTURE (FILL IN THE BRACKETS BELOW):\n\n[Scene paragraph prompt here]\n\nMain character: [description of character]\nThey say: [insert one line of dialogue, fits the scene and mood].\nThey [describe a physical action or subtle camera movement, e.g. pans the camera, shifts position, glances around].\nTime of Day: [day / night / dusk / etc.]\nLens: [describe lens]\nAudio: (implied) [ambient sounds, e.g. lion growls, wind, distant traffic, birdsong]\nBackground: [brief restatement of what is visible behind them]\n\nRULES FOR PROMPT GENERATION\n\nSingle paragraph only, 750–1500 characters. No line breaks or headings.\n\nOnly one human character. Never give them a name.\n\nInclude one spoken line of dialogue and describe how it’s delivered.\n\nCharacter must do something physical, even if subtle (e.g. glance, smirk, pan camera).\n\nUse selfie-style framing. Always describe the lens, stock, and camera behavior.\n\nScene must feel real and cinematic — like a short clip someone might record on a stylized camera.\n\nAlways include the five key technical elements: Time of Day, Lens, Film Stock, Audio, and Background.\n\nDO NOT DO THIS:\n\nDon’t name the character.\n\nDon’t include more than one character.\n\nDon’t describe subtitles or on-screen text.\n\nDon’t break the paragraph or use formatting.\n\nDon’t write vague or abstract scenes — always keep them grounded in physical detail."
+        }
+      },
+      "id": "7158d50c-21f3-40ef-b629-845dff7c6551",
+      "name": "Генерація промпта",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        672,
+        496
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {},
+      "id": "8770a82c-acfa-4e05-8b2d-14f43d26a3f4",
+      "name": "Очікуєм 5хв",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1360,
+        624
+      ],
+      "webhookId": "861e2761-369b-407b-9e88-1b176e617cd8",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "url": "=https://queue.fal.run/fal-ai/veo3/requests/{{ $json.request_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "7b4b5529-aa4c-4a30-a631-56eb414aa785",
+      "name": "Витягуєм посилання з Veo3",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1600,
+        624
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/fal-ai/veo3",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={ \n\"prompt\": \"{{ $json.output }}\",\n  \"aspect_ratio\": \"9:16\",\n  \"duration\": \"8s\",\n  \"enhance_prompt\": true,\n  \"resolution\": \"720p\",\n  \"generate_audio\": true\n}\n",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 2000
+            }
+          }
+        }
+      },
+      "id": "26e62cfc-5bd3-4e88-8a34-f7db7ca6b468",
+      "name": "Запит на генерацію відео Veo3",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1136,
+        624
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c",
+          "mode": "list",
+          "cachedResultName": "Контент машина",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "production": "done",
+            "final_output": "={{ $json.video.url }}",
+            "id": "=",
+            "idea": "={{ $('Збереження ідеї').first().json.idea }}"
+          },
+          "matchingColumns": [
+            "idea"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "idea",
+              "displayName": "idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "production",
+              "displayName": "production",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "environment_prompt",
+              "displayName": "environment_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "final_output",
+              "displayName": "final_output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8bf94901-f4ad-459a-b8f1-4292b20e00f0",
+      "name": "Записуєм посилання",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1840,
+        624
+      ],
+      "typeVersion": 4.5,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c",
+          "mode": "list",
+          "cachedResultName": "Контент машина",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "production",
+              "lookupValue": "done"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c568a4df-4d54-43e4-b267-2a4afd801fe7",
+      "name": "Дістаєм інфу про відео",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -80,
+        960
+      ],
+      "typeVersion": 4.5,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"instagram_id\": \"1111\",\n  \"youtube_id\": \"1111\",\n  \"threads_id\": \"1111\",\n  \"tiktok_id\": \"1111\",\n  \"facebook_id\": \"1111\",\n  \"facebook_page_id\": \"1111\",\n  \"twitter_id\": \"1111\",\n  \"linkedin_id\": \"1111\",\n  \"pinterest_id\": \"1111\",\n  \"pinterest_board_id\": \"1111\",\n  \"bluesky_id\": \"1111\"\n}\n",
+        "options": {}
+      },
+      "id": "e0f02b29-03b5-4bca-8cde-077add8b145d",
+      "name": "ID соцмереж",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -80,
+        1168
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://backend.blotato.com/v2/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $('Дістаєм інфу про відео').item.json.final_output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "182357a7-6b98-406c-8650-675772f8707b",
+      "name": "Вантажим на Blotato",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        160,
+        1168
+      ],
+      "typeVersion": 4.2,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c",
+          "mode": "list",
+          "cachedResultName": "Контент машина",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VQDr_EjqaURBYPBLiUs8enHjLyH7iD4uDauZdz0NX6c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Дістаєм інфу про відео').item.json.row_number }}",
+            "production": "published"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "idea",
+              "displayName": "idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "production",
+              "displayName": "production",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "environment_prompt",
+              "displayName": "environment_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "final_output",
+              "displayName": "final_output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "85393283-df30-4ad5-a080-d51857072e4e",
+      "name": "Міняєм статус на опубліковано",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        288,
+        992
+      ],
+      "typeVersion": 4.5,
+      "credentials": {}
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Trigger: Run Daily Script Generator": {
+      "main": [
+        [
+          {
+            "node": "Генерація ідеї",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Генерація ідеї": {
+      "main": [
+        [
+          {
+            "node": "Збереження ідеї",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Збереження ідеї": {
+      "main": [
+        [
+          {
+            "node": "Генерація промпта",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-4.1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Генерація ідеї",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Генерація ідеї",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(GPT-4.1)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Генерація промпта",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Генерація промпта": {
+      "main": [
+        [
+          {
+            "node": "Запит на генерацію відео Veo3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Очікуєм 5хв": {
+      "main": [
+        [
+          {
+            "node": "Витягуєм посилання з Veo3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Витягуєм посилання з Veo3": {
+      "main": [
+        [
+          {
+            "node": "Записуєм посилання",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Запит на генерацію відео Veo3": {
+      "main": [
+        [
+          {
+            "node": "Очікуєм 5хв",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Записуєм посилання": {
+      "main": [
+        [
+          {
+            "node": "Дістаєм інфу про відео",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Дістаєм інфу про відео": {
+      "main": [
+        [
+          {
+            "node": "ID соцмереж",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ID соцмереж": {
+      "main": [
+        [
+          {
+            "node": "Вантажим на Blotato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Вантажим на Blotato": {
+      "main": [
+        [
+          {
+            "node": "INSTAGRAM",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "THREADS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "FACEBOOK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "X (Twitter)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "PINTEREST",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LINKEDIN",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "YOUTUBE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TIKTOK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Міняєм статус на опубліковано",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6004836b-8828-4599-ac55-e436ae087854",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c23a816965dd7142d39c31f3ac0263da3d17c48e067f721567e0849a8b61549"
+  },
+  "id": "0sJGjl4qg4FKB3Fr",
+  "tags": []
+}

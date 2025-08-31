@@ -1,0 +1,129 @@
+{
+  "name": "Website Chat",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Ти ввічливий та професійний помічник барбершопу.  \nТвоя задача — відповідати на запити клієнтів, допомагати з бронюванням стрижок, пояснювати ціни та послуги, а також відповідати на типові питання.  \nЗавжди будь дружнім, точним і лаконічним. Якщо клієнт хоче записатися — запитай зручний день і час.\n\nНе вигадуй інформації — відповідай лише по суті. Якщо не знаєш чогось — ввічливо скажи, що уточниш."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        220,
+        0
+      ],
+      "id": "585cabdc-1c89-476e-94dc-26aca0eb760f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        140,
+        140
+      ],
+      "id": "c7136ae0-9e6d-4d74-99cf-2b6f0050bcff",
+      "name": "OpenAI Chat Model",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "databaseName": "project_sky",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        140,
+        -140
+      ],
+      "id": "3fcea873-b4e4-4ec7-b1af-7c71a89f1396",
+      "name": "MongoDB Chat Memory",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {
+          "loadPreviousSession": "memory"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        0
+      ],
+      "id": "69cdf932-dc86-4a32-bf90-c30ea8daea2c",
+      "name": "When chat message received",
+      "webhookId": "43d83ff9-f3a1-49da-beef-21c89aaf0ea1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "When chat message received",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "62ab0bc1-de8f-42d3-a2fe-8b02a2b7a4fc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c23a816965dd7142d39c31f3ac0263da3d17c48e067f721567e0849a8b61549"
+  },
+  "id": "drXmRmkBMWWj5ott",
+  "tags": []
+}

@@ -1,0 +1,528 @@
+{
+  "name": "parse_air_alert_tg_channel",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        -784
+      ],
+      "id": "f00b246f-38ea-4cdb-bc5a-86ee5efdb859",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -336,
+        -352
+      ],
+      "id": "5207a08b-5379-4969-8a70-2a2a3e200a8b",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "url": "=https://t.me/s/<tg_channel>?after=-1 ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -368,
+        -784
+      ],
+      "id": "37d4f841-ab67-48b3-934d-7f747bed0683",
+      "name": "get messages"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "message",
+              "cssSelector": ".tgme_widget_message",
+              "returnValue": "html",
+              "returnArray": true
+            },
+            {
+              "key": "id",
+              "cssSelector": ".tgme_widget_message",
+              "returnValue": "attribute",
+              "attribute": "data-post",
+              "returnArray": true
+            },
+            {
+              "key": "timestamp",
+              "cssSelector": "time",
+              "returnValue": "attribute",
+              "attribute": "datetime",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -880,
+        -480
+      ],
+      "id": "16975124-edde-4af3-b6a9-311ef5012cc9",
+      "name": "message html"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "message",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "timestamp",
+              "cssSelector": "time",
+              "returnValue": "attribute",
+              "attribute": "datetime"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -704,
+        -480
+      ],
+      "id": "a69f260c-ccc8-4c93-bbd5-79a4cf4eb3d5",
+      "name": "timestamp"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "id",
+              "cssSelector": ".tgme_widget_message",
+              "returnValue": "attribute",
+              "attribute": "data-post",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -880,
+        -304
+      ],
+      "id": "5eaae56b-c96b-46a1-b31c-c8f8e77361d0",
+      "name": "id"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.flatMap(item => {\n    return item.json.id.map(fullId => {\n        const [channel, tg_msg_id] = fullId.split('/');\n\n        return {\n            json: {\n                channel,\n                tg_msg_id,\n            }\n        };\n    });\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        -304
+      ],
+      "id": "64a35a06-ed67-4e96-8c08-2ae5f1e8066c",
+      "name": "split ids"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "message",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "message",
+              "cssSelector": ".tgme_widget_message_text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -544,
+        -480
+      ],
+      "id": "1fa7210d-62f7-49b8-b805-e69d2bd96e73",
+      "name": "text"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ти — агент, який аналізує серію повідомлень про повітряні загрози на території України.  \nТвоя мета — надати обʼєктивну оцінку ситуації на основі 20 останніх повідомлень, враховуючи як зміст, так і хронологію подій.\n\n📍 Користувач знаходиться у місті: {{ $('.env').item.json.userCity }}  \n🕐 Поточний час: {{ $now }}\n\nОсь твої задачі:\n\n1. Проаналізуй часову послідовність подій у списку повідомлень: які з них найновіші, чи є загрози, чи були пуски ракет, прольоти або відбій небезпеки.\n\n3. Враховуй **відбої тривог**. Якщо у повідомленнях є *відбій* ракетної небезпеки по місту, області чи загалом по частині країни де знаходиться корситувач, і немає нових тривожних подій — це має знижувати рівень небезпеки.\n4. Визначи **рівень небезпеки**:\n   - 🔴 Висока — активна загроза для локації користувача (пуск, проліт, напрям ракет)\n   - 🟠 Середня — потенційна загроза (напрямок наближений, локація користувача згадується непрямо)\n   - 🟢 Низька — все спокійно або є лише загрози в інших регіонах\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -848,
+        -48
+      ],
+      "id": "90d72006-89b1-4612-82ef-cf9ab724fc85",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -320
+      ],
+      "id": "f4db3fe1-3454-4907-b685-f2ee67722a58",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -880,
+        128
+      ],
+      "id": "0bf4d2ce-5109-46a7-9b1e-6b26d8429e70",
+      "name": "OpenAI Chat Model",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"summary\": \"Стислий висновок про ситуацію (1 речення)\",\n  \"danger_level\": \"🔴 / 🟠 / 🟢\",\n  \"is_user_in_danger\": \"boolean\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -688,
+        128
+      ],
+      "id": "b43746c6-63cf-4eec-9e80-360cb96c9b3c",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ed11211d-86dd-4849-98d0-05fca4230368",
+              "name": "tg_channel",
+              "value": "<тг канал>",
+              "type": "string"
+            },
+            {
+              "id": "8cdd4e35-496d-48d7-8b63-03ba1869fa07",
+              "name": "userCity",
+              "value": "<область, місто>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -544,
+        -784
+      ],
+      "id": "e9ac5dff-a665-4e23-87a6-086201488205",
+      "name": ".env"
+    },
+    {
+      "parameters": {
+        "url": "https://ubilling.net.ua/aerialalerts/?map=webp",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -464,
+        48
+      ],
+      "id": "68ea08e5-7e62-4f6d-bba3-39fb2b32b000",
+      "name": "карта тривог"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "<chat_id>",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "=Загроза: {{ $json.output.danger_level }}\nЛокація: {{ $('.env').item.json.userCity }}\n\n{{ $json.output.summary }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -224,
+        48
+      ],
+      "id": "8ccd37a1-33dc-4479-b3cc-ec306b51774d",
+      "name": "в телеграм",
+      "webhookId": "b818e6f8-c121-4a27-a2bf-61576da29d9c",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "content": "## Парсинг",
+        "height": 432,
+        "width": 976,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        -560
+      ],
+      "typeVersion": 1,
+      "id": "64eee2b2-0b73-4e08-b3ab-712d6ed5199c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Запит",
+        "height": 320,
+        "width": 784,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -864,
+        -896
+      ],
+      "typeVersion": 1,
+      "id": "94c7ff1f-617a-45c4-bb05-b5b48ba3f0d2",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Агент ",
+        "height": 400,
+        "width": 976,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "d14e1323-74ee-49b2-8489-3b3d053faa1f",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": ".env",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get messages": {
+      "main": [
+        [
+          {
+            "node": "message html",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "message html": {
+      "main": [
+        [
+          {
+            "node": "text",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "timestamp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "timestamp": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "id": {
+      "main": [
+        [
+          {
+            "node": "split ids",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "split ids": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "text": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "карта тривог",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".env": {
+      "main": [
+        [
+          {
+            "node": "get messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "карта тривог": {
+      "main": [
+        [
+          {
+            "node": "в телеграм",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "в телеграм": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7c802028-e168-457b-ab85-95150b682cf7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c23a816965dd7142d39c31f3ac0263da3d17c48e067f721567e0849a8b61549"
+  },
+  "id": "quzew74ekkpFHi8Z",
+  "tags": []
+}

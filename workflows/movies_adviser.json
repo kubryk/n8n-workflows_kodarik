@@ -1,0 +1,580 @@
+{
+  "name": "Movie",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Ти — інтелектуальний рекомендаційний агент, який пропонує користувачу фільм на основі його вподобань і запиту.\n\n---\n\n🔁 ПЕРЕД тим як рекомендувати фільм:\n1. Використай інструмент `all_liked_movies`, щоб отримати список фільмів, які користувачу подобаються.\n2. Використай інструмент `all_disliked_movies`, щоб отримати список фільмів, які користувачу не сподобались.\n\nНе рекомендуй жодного фільму, поки ці дані не будуть отримані.\n\n---\n\n🎯 Твоє завдання після цього:\n- Проаналізуй список вподобаних фільмів: визнач спільні риси — жанри, тематику, стиль, темп, атмосферу, сюжет.\n- Уникай фільмів, які вже є у списках `сподобалось` і `не сподобалось`.\n- Підібрай **один найкращий фільм**, який максимально відповідає вподобанням користувача.\n\n---\n\n📌 При рекомендації:\n- Використовуй **тільки реальні фільми** (наприклад, з TMDB).\n- Завжди перекладай опис фільму на **українську мову**.\n- Уникай вигаданих фактів.\n- Рекомендація повинна бути **одна, логічно обґрунтована** та цікава.\n\n\n📥 Після того, як користувач висловить свою думку про фільм використай тільки один з цих двох інструментів більше не рекомендуй:\n\n✅ Якщо **фільм сподобався**, виклич інструмент: add_liked_movie\n\n⛔ Якщо фільм не сподобався, виклич інструмент: add_disliked_movie"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -260,
+        0
+      ],
+      "id": "37588aba-6fb0-4e13-b3a8-c1387ae46c5c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        300
+      ],
+      "id": "f05903b1-5b32-43c8-ab75-58136333c2b4",
+      "name": "OpenAI Chat Model",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"movie_title\": \"string\",\n\t\"description\": \"string\",\n    \"release_date\": \"string\",\n    \"vote_average\": \"string\",\n    \"vote_count\": \"string\",\n    \"poster_path\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        300
+      ],
+      "id": "ad077251-37fb-4d27-8db9-00e1de303483",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -520,
+        0
+      ],
+      "id": "70971534-cb83-454f-a88e-ccb4f4e699d6",
+      "name": "Telegram Trigger",
+      "webhookId": "2f3a1886-3bba-42fe-8e81-c151517039a7",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE",
+          "mode": "list",
+          "cachedResultName": "Фільми",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1933658243,
+          "mode": "list",
+          "cachedResultName": "disliked",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE/edit#gid=1933658243"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "movie_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('movie_name', ``, 'string') }}",
+            "movie_description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('movie_description', ``, 'string') }}",
+            "rating": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('rating', ``, 'string') }}",
+            "rating_count": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('rating_count', ``, 'string') }}",
+            "release_date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('release_date', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "movie_name",
+              "displayName": "movie_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "movie_description",
+              "displayName": "movie_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rating",
+              "displayName": "rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rating_count",
+              "displayName": "rating_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "release_date",
+              "displayName": "release_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        620,
+        300
+      ],
+      "id": "c52d84d2-1ddd-4a59-ab0b-4f2f2f38b037",
+      "name": "add_disliked_movie",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request and returns the movie data",
+        "url": "https://api.themoviedb.org/3/search/movie",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -20,
+        300
+      ],
+      "id": "95606aac-3b6d-411b-9bb8-e60db1ab783d",
+      "name": "get_movie_info"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE",
+          "mode": "list",
+          "cachedResultName": "Фільми",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "liked",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "movie_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('movie_name', ``, 'string') }}",
+            "movie_description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('movie_description', ``, 'string') }}",
+            "rating": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('rating', ``, 'string') }}",
+            "rating_count": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('rating_count', ``, 'string') }}",
+            "release_date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('release_date', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "movie_name",
+              "displayName": "movie_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "movie_description",
+              "displayName": "movie_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rating",
+              "displayName": "rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rating_count",
+              "displayName": "rating_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "release_date",
+              "displayName": "release_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        460,
+        300
+      ],
+      "id": "4ad7f63c-5f2b-431b-8c8f-d80b43439823",
+      "name": "add_liked_movie",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "file": "=https://image.tmdb.org/t/p/w780/{{ $json.output.poster_path }}",
+        "additionalFields": {
+          "caption": "={{ $json.output.movie_title }}\n\n⭐️ Оцінка: {{ $json.output.vote_average }}/10  \n👥 Кількість оцінок: {{ $json.output.vote_count }}\n📅 Рік: {{ $json.output.release_date }}\n\n📝 Опис:  \n{{ $('AI Agent').item.json.output.description }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        60
+      ],
+      "id": "ef36379f-35d0-413c-aedc-0916c743d97b",
+      "name": "Telegram",
+      "webhookId": "499a02f9-dfeb-444f-8b28-5d74acfca3e3",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE",
+          "mode": "list",
+          "cachedResultName": "Фільми",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "liked",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        140,
+        300
+      ],
+      "id": "11733277-a533-4c14-8186-788b067d31c6",
+      "name": "all_liked_movies",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE",
+          "mode": "list",
+          "cachedResultName": "Фільми",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1933658243,
+          "mode": "list",
+          "cachedResultName": "disliked",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D8AObGuAVCPlil5HTCucQQf_01SbZySRBJY5TKkFOIE/edit#gid=1933658243"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        300,
+        300
+      ],
+      "id": "33db09c7-3f50-47bd-970e-6d543f27db54",
+      "name": "all_disliked_movies",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6c4700c9-5946-4c85-afd1-26f8e4c3356c",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        100,
+        0
+      ],
+      "id": "86608ce0-ce08-4885-89ad-1fc0b9f71566",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Добре, я це записав.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        -120
+      ],
+      "id": "06b8d298-1146-4909-8bbb-db6cf1bcf516",
+      "name": "Telegram2",
+      "webhookId": "499a02f9-dfeb-444f-8b28-5d74acfca3e3",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        300
+      ],
+      "id": "e0ab35b5-ae64-425f-9795-8aa3eddb390f",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_movie_info": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add_liked_movie": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "all_liked_movies": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add_disliked_movie": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "all_disliked_movies": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ed239449-b68d-4557-890c-1159f836c5ef",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c23a816965dd7142d39c31f3ac0263da3d17c48e067f721567e0849a8b61549"
+  },
+  "id": "WPFrFVfcEiqiFjxR",
+  "tags": []
+}

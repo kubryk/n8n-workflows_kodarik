@@ -1,0 +1,424 @@
+{
+  "name": "LLM price monitoring",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ce398fa8-6f0c-48f2-b524-9450895e824a",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        1776,
+        368
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Тестовий промпт для прикладу",
+        "options": {}
+      },
+      "id": "0049c07c-924b-449d-9ef1-e0aeea568ed4",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1920,
+        368
+      ],
+      "typeVersion": 1.8
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $workflow.id }}"
+        },
+        "workflowInputs": {
+          "value": {
+            "execution_id": "={{ $execution.id }}"
+          },
+          "schema": [
+            {
+              "id": "execution_id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "execution_id",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "execution_id"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "id": "b04475d0-6479-4e1b-8101-d3a6502f8bd3",
+      "name": "Call sub-workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "position": [
+        2192,
+        368
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "execution_id"
+            }
+          ]
+        }
+      },
+      "id": "d4839ce7-fc14-4595-919c-82820b662158",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        1536,
+        704
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "tokenUsage",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "670ff325-654d-4c19-98f5-5388e0114916",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        2064,
+        704
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1920,
+        512
+      ],
+      "id": "dd0dd4e7-d502-457d-85c1-9cccd7cb216f",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "sum",
+              "field": "tokenUsage.tokenUsage.promptTokens"
+            },
+            {
+              "aggregation": "sum",
+              "field": "tokenUsage.tokenUsage.completionTokens"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "id, name, tokenUsage.model, execution_id",
+        "options": {}
+      },
+      "id": "92906450-edbb-4b8e-babf-21e303e65512",
+      "name": "сума токенів",
+      "type": "n8n-nodes-base.summarize",
+      "position": [
+        2208,
+        704
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1D-_ccvLqIh235DjigMW_39gaeYfUXMSNP6Ek2EiA8JQ",
+          "mode": "list",
+          "cachedResultName": "llm price",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D-_ccvLqIh235DjigMW_39gaeYfUXMSNP6Ek2EiA8JQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1D-_ccvLqIh235DjigMW_39gaeYfUXMSNP6Ek2EiA8JQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "workflow_id": "={{ $json.id }}",
+            "execution_id": "={{ $json.execution_id }}",
+            "input tokens": "={{ $json.sum_tokenUsage_tokenUsage_promptTokens }}",
+            "workflow_name": "={{ $json.name }}",
+            "completion tokens": "={{ $json.sum_tokenUsage_tokenUsage_completionTokens }}",
+            "time": "={{ $now.format('yyyy-MM-dd HH:mm:ss')}}",
+            "llm": "={{ $json.tokenUsage_model }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "workflow_id",
+              "displayName": "workflow_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "workflow_name",
+              "displayName": "workflow_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "llm",
+              "displayName": "llm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "input tokens",
+              "displayName": "input tokens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "completion tokens",
+              "displayName": "completion tokens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "704137ef-dc03-41b5-b86b-7e9c6ce093d8",
+      "name": "в таблицю",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        2352,
+        704
+      ],
+      "typeVersion": 4.6
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2e6b9daf-495c-44e3-a39e-40fc8e654eae",
+              "name": "execution_id",
+              "type": "number",
+              "value": "={{ $('When Executed by Another Workflow').item.json.execution_id }}"
+            },
+            {
+              "id": "1ba39074-c67e-453c-9a64-07e0376e64bf",
+              "name": "tokenUsage",
+              "type": "array",
+              "value": "={{$jmespath(\n  $json,\n  \"data.resultData.runData.*[] | [?data.ai_languageModel] | [].{model: data.ai_languageModel[0][0].json.response.generations[0][0].generationInfo.model_name || inputOverride.ai_languageModel[0][0].json.options.model_name || inputOverride.ai_languageModel[0][0].json.options.model, tokenUsage: data.ai_languageModel[0][0].json.tokenUsage || data.ai_languageModel[0][0].json.tokenUsageEstimate}\"\n)}}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "includeFields": "workflowData.id, workflowData.name",
+        "options": {}
+      },
+      "id": "aa499ec8-9f02-4d35-ac8f-dca9e5a20d7a",
+      "name": "дістаєм дані",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1904,
+        704
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "resource": "execution",
+        "operation": "get",
+        "executionId": "={{ $json.execution_id }}",
+        "options": {
+          "activeWorkflows": true
+        },
+        "requestOptions": {}
+      },
+      "id": "989df72b-45f2-4910-9458-f77d3702de4b",
+      "name": "дані виконання",
+      "type": "n8n-nodes-base.n8n",
+      "position": [
+        1728,
+        704
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "execution_id": "20996"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Call sub-workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "сума токенів",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "дані виконання",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "сума токенів": {
+      "main": [
+        [
+          {
+            "node": "в таблицю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "дістаєм дані": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "дані виконання": {
+      "main": [
+        [
+          {
+            "node": "дістаєм дані",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cc55807e-e9dc-49f7-a708-ef4ca881c8ba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c23a816965dd7142d39c31f3ac0263da3d17c48e067f721567e0849a8b61549"
+  },
+  "id": "k5OTC055R6h0HbBO",
+  "tags": []
+}

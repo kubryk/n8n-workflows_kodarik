@@ -1,0 +1,293 @@
+{
+  "name": "Voice agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        0
+      ],
+      "id": "79ed9362-49dc-47dc-9d55-dc0c3f6f276c",
+      "name": "Telegram Trigger",
+      "webhookId": "768bba1d-d174-4377-b8c5-769a01b2b5a2",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        0
+      ],
+      "id": "270a3192-803e-42da-aff3-a7aefd7fd3b4",
+      "name": "Telegram",
+      "webhookId": "a1361cfe-356f-44d8-b8fe-f9d3d07ea3e8",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=Ти — розумний та ввічливий помічник барбершопу “The Sharp Cut”. Твоє головне завдання — допомагати клієнтам записатися на стрижку.\n\nТвоя роль:\n\t•\tВітати клієнтів доброзичливо і професійно.\n\t•\tЗапитувати ім’я клієнта, бажану дату й час, а також майстра (за потреби).\n\t•\tПеревіряти наявність вільного часу в графіку.\n\t•\tЯкщо вільний час є — підтверджувати запис.\n\t•\tЯкщо ні — пропонувати альтернативні варіанти.\n\t•\tВести себе чемно, швидко й зрозуміло.\n\t•\tЗа потреби відповідати на базові запитання (ціна, послуги, адреса, графік).\n\nОбмеження:\n\t•\tНе приймаєш платежі.\n\t•\tНе обговорюєш особисті теми.\n\t•\tНе продаєш додаткові послуги — лише допомагаєш із записом.\n\nКонтекст:\n\t•\tБарбершоп працює щодня з 10:00 до 20:00.\n\t•\tОдин сеанс стрижки триває 1 годину.\n\t•\tГрафік зберігається у зовнішній системі (наприклад, Google Calendar або база даних), яку ти можеш перевіряти через API або відповідну ноду в n8n.\n\t•\tЯкщо клієнт скасовує запис, внось зміни до розкладу."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        660,
+        0
+      ],
+      "id": "4839f274-7b36-47c7-855c-9e4051d8fc0c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "06bfc1b7-8342-4227-b266-fa39084905b8",
+              "name": "elevenlabs_key",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "id": "87582405-6285-451c-9c19-8f37bdb11ace",
+      "name": ".env"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/speech-to-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "={{ $('.env').item.json.elevenlabs_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "model_id",
+              "value": "scribe_v1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        0
+      ],
+      "id": "54c0f506-ba01-4d7f-b92c-fd6ca439d2ea",
+      "name": "speech to text"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        180
+      ],
+      "id": "287e83b9-2153-4c74-bbb2-8b28b674faea",
+      "name": "OpenAI Chat Model",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {
+          "fileName": "responseAudio.mp3"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1140,
+        0
+      ],
+      "id": "f407a5b5-8bca-4066-9cc6-6328c5ff71c5",
+      "name": "Telegram1",
+      "webhookId": "edf71810-8368-4c7a-9527-768b16747af0",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/text-to-speech/GVRiwBELe0czFUAJj0nX",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "={{ $('.env').item.json.elevenlabs_key }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "model_id",
+              "value": "eleven_multilingual_v2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        980,
+        0
+      ],
+      "id": "8c52b001-8e71-4c90-b4ab-5c9debbec103",
+      "name": "text to speech"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": ".env",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "speech to text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".env": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "speech to text": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "text to speech",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text to speech": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8e572f9f-6f55-40b8-b60d-41cad227e09a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c23a816965dd7142d39c31f3ac0263da3d17c48e067f721567e0849a8b61549"
+  },
+  "id": "THnNAYRaMZ996kXM",
+  "tags": []
+}
