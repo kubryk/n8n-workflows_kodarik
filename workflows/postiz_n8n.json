@@ -1,0 +1,379 @@
+{
+  "name": "Postiz + n8n",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        544,
+        48
+      ],
+      "id": "e9036d64-2fac-4be3-bab1-06cfac623428",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "=https://drive.google.com/file/d/",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        720,
+        48
+      ],
+      "id": "8733247d-065d-4415-98a6-5da3645991d5",
+      "name": "Download file",
+      "executeOnce": false,
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "date": "2025-08-30T17:30:03",
+        "posts": {
+          "post": [
+            {
+              "integrationId": "={{ $('Всі соцмережі').item.json.id }}",
+              "settings": {
+                "setting": [
+                  {
+                    "key": "privacy_level",
+                    "stringValue": "SELF_ONLY"
+                  },
+                  {
+                    "key": "content_posting_method",
+                    "stringValue": "DIRECT_POST"
+                  },
+                  {
+                    "key": "autoAddMusic",
+                    "stringValue": "no"
+                  },
+                  {
+                    "key": "comment",
+                    "booleanValue": true,
+                    "valueType": "boolean"
+                  },
+                  {
+                    "key": "duet",
+                    "valueType": "boolean"
+                  },
+                  {
+                    "key": "stitch",
+                    "valueType": "boolean"
+                  },
+                  {
+                    "key": "video_made_with_ai",
+                    "valueType": "boolean"
+                  },
+                  {
+                    "key": "disclose",
+                    "valueType": "boolean"
+                  },
+                  {
+                    "key": "brand_organic_toggle",
+                    "valueType": "boolean"
+                  },
+                  {
+                    "key": "brand_content_toggle",
+                    "valueType": "boolean"
+                  }
+                ]
+              },
+              "value": {
+                "contentItem": [
+                  {
+                    "content": "Hello",
+                    "id": "={{ $json.id }}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-postiz.postiz",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        144
+      ],
+      "id": "35a4a3d6-db02-4be3-9452-3e99a0c74ef0",
+      "name": "TikTok",
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.identifier }}",
+                    "rightValue": "instagram",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8b022980-6955-41b9-ada0-05b582f90b62"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "instagram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b31b6748-b097-48e1-b93e-6fd2e983ca5f",
+                    "leftValue": "={{ $json.identifier }}",
+                    "rightValue": "tiktok",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "tiktok"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1376,
+        48
+      ],
+      "id": "6c204070-2533-45f9-94f5-f9f71d97a311",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "date": "2025-08-30T20:04:27",
+        "posts": {
+          "post": [
+            {
+              "integrationId": "={{ $json.id }}",
+              "settings": {
+                "setting": [
+                  {
+                    "key": "post_type",
+                    "stringValue": "post"
+                  }
+                ]
+              },
+              "value": {
+                "contentItem": [
+                  {
+                    "content": "Hello",
+                    "id": "=",
+                    "image": {
+                      "imageItem": [
+                        {
+                          "id": "={{ $('завантаження').item.json.id }}",
+                          "path": "={{ $('завантаження').item.json.path }}"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-postiz.postiz",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        -32
+      ],
+      "id": "ec4400b4-cfd2-46c9-be3e-f5641eb5d7f3",
+      "name": "Instagram",
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        48
+      ],
+      "id": "18b1aaa9-b6db-4e16-a661-3c1cc5c44ee7",
+      "name": "Wait",
+      "webhookId": "4012c87a-f85c-4b16-8afa-91f0eca40a5c"
+    },
+    {
+      "parameters": {
+        "operation": "uploadFile",
+        "binaryProperty": "={{ $('Download file').item.binary}}"
+      },
+      "type": "n8n-nodes-postiz.postiz",
+      "typeVersion": 1,
+      "position": [
+        880,
+        48
+      ],
+      "id": "a72eb908-7495-485f-8212-26be923acf6b",
+      "name": "завантаження",
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getIntegrations"
+      },
+      "type": "n8n-nodes-postiz.postiz",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        48
+      ],
+      "id": "a4ac34c8-80aa-4770-aace-22a2d5b6aedb",
+      "name": "Всі соцмережі",
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Посилання\nІнструмент: https://postiz.com/\nКастомна нода: https://www.npmjs.com/package/n8n-nodes-postiz\n\nАвтор: https://www.tiktok.com/@pro_kodarik\n",
+        "height": 144,
+        "width": 528
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        528,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "9c6052b7-fda2-4d4c-9320-8d5873837515",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "завантаження",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TikTok": {
+      "main": [
+        []
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TikTok",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Всі соцмережі",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "завантаження": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Всі соцмережі": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "zAdHZjYDVJjOb1j4"
+  },
+  "versionId": "9c5c7838-7646-441f-b816-bab518f95821",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4c23a816965dd7142d39c31f3ac0263da3d17c48e067f721567e0849a8b61549"
+  },
+  "id": "9Ml533DcWHZ254UI",
+  "tags": []
+}
